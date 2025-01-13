@@ -29,7 +29,7 @@ export const metaDataService = {
       const country = await Country.find().populate({
         path: 'regions',
         model: WineRegion, // Ensure this matches your WineRegion model name
-        select: "name _id",
+        select: "region _id",
         populate: {
           path: 'subRegions',
           model: SubRegion,

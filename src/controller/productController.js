@@ -1,5 +1,5 @@
-import {productService} from "../service/productService.js";
-import {errorResponse, successResponse} from "../util/responseUtil.js";
+import { productService } from "../service/productService.js";
+import { errorResponse, successResponse } from "../util/responseUtil.js";
 
 export const productController = {
     // Add new product
@@ -16,7 +16,7 @@ export const productController = {
 
     // Update product
     updateProduct: async (req, res) => {
-        const {productId} = req.params;
+        const { productId } = req.params;
         const productData = req.body;
 
         try {
@@ -29,7 +29,7 @@ export const productController = {
 
     // View single product
     viewSingleProduct: async (req, res) => {
-        const {productId} = req.params;
+        const { productId } = req.params;
 
         try {
             const product = await productService.viewSingleProduct(productId);
@@ -51,11 +51,12 @@ export const productController = {
             vintageId,
             priceMin,
             priceMax,
+            countryId,
             subRegionId,
             subCategoryId,
             drynessId,
-            sizeTypeId,
-            collectableId,
+            sizeId,
+            typeId,
             abvMin,
             abvMax,
             categoryId,
@@ -72,51 +73,90 @@ export const productController = {
                 vintageId,
                 priceMin,
                 priceMax,
+                countryId,
                 subRegionId,
                 subCategoryId,
                 drynessId,
-                sizeTypeId,
-                collectableId,
+                sizeId,
+                typeId,
                 abvMin,
                 abvMax,
                 categoryId,
             });
 
-            console.log(products)
+            // console.log(products)
 
 
             return successResponse(res, "Products fetched successfully", {
-                docs: products.docs.map((product) => ({
-                    _id: product._id,
-                    name: product.name,
-                    description: product.description,
-                    unitBuyingPrice: product.unitBuyingPrice,
-                    unitPrice: product.unitPrice,
-                    unitDiscount: product.unitDiscount,
-                    packSize: product.packSize,
-                    packBuyingPrice: product.packBuyingPrice,
-                    packPrice: product.packPrice,
-                    packDiscount: product.packDiscount,
-                    discountName: product.discountName,
-                    isGreatForGift: product.isGreatForGift,
-                    rating: product.rating,
-                    qtyOnHand: product.qtyOnHand,
-                    categories: product.categories,
-                    subCategories: product.subCategories,
-                    regions: product.regions,
-                    subRegions: product.subRegions,
-                    country: product.country,
-                    vintage: product.vintage,
-                    sizeTypes: product.sizeTypes,
-                    abv: product.abv,
-                    collectables: product.collectables,
-                    image: product.image,
-                    inStock: product.inStock,
-                    isActive: product.isActive,
-                    dryness: product.dryness,
-                    createdAt: product.createdAt,
-                    updatedAt: product.updatedAt,
-                })),
+                docs: products.docs.map((product) => {
+                    const {
+                        _id,
+                        name,
+                        description,
+                        unitBuyingPrice,
+                        unitPrice,
+                        unitDiscount,
+                        packSize,
+                        packBuyingPrice,
+                        packPrice,
+                        packDiscount,
+                        discountName,
+                        isGreatForGift,
+                        rating,
+                        qtyOnHand,
+                        categories,
+                        subCategories,
+                        regions,
+                        subRegions,
+                        country,
+                        vintage,
+                        sizeTypes,
+                        abv,
+                        collectables,
+                        image,
+                        isPack,
+                        pack,
+                        inStock,
+                        isActive,
+                        dryness,
+                        createdAt,
+                        updatedAt,
+                    } = product;
+
+                    return {
+                        _id,
+                        name,
+                        description,
+                        unitBuyingPrice,
+                        unitPrice,
+                        unitDiscount,
+                        packSize,
+                        packBuyingPrice,
+                        packPrice,
+                        packDiscount,
+                        discountName,
+                        isGreatForGift,
+                        rating,
+                        qtyOnHand,
+                        categories,
+                        subCategories,
+                        regions,
+                        subRegions,
+                        country,
+                        vintage,
+                        sizeTypes,
+                        abv,
+                        collectables,
+                        image,
+                        inStock,
+                        isPack,
+                        pack: isPack ? pack : [],
+                        isActive,
+                        dryness,
+                        createdAt,
+                        updatedAt,
+                    };
+                }),
                 totalDocs: products.totalDocs,
                 limit: products.limit,
                 totalPages: products.totalPages,
@@ -340,7 +380,7 @@ export const productController = {
 
     // Delete product by setting isActive to false
     deleteProduct: async (req, res) => {
-        const {productId} = req.params;
+        const { productId } = req.params;
 
         try {
             const updatedProduct = await productService.deleteProduct(productId);
@@ -352,8 +392,8 @@ export const productController = {
 
     // Add rating
     addRating: async (req, res) => {
-        const {productId} = req.params;
-        const {rating} = req.body;
+        const { productId } = req.params;
+        const { rating } = req.body;
 
         try {
             if (typeof rating !== "number" || rating < 0 || rating > 5) {

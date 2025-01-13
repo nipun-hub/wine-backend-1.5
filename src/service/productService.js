@@ -85,11 +85,12 @@ export const productService = {
         vintageId,
         priceMin,
         priceMax,
+        countryId,
         subRegionId,
         subCategoryId,
         drynessId,
-        sizeTypeId,
-        collectableId,
+        sizeId,
+        typeId,
         abvMin,
         abvMax,
         categoryId,
@@ -116,6 +117,10 @@ export const productService = {
                 if (priceMax) query.unitPrice.$lte = parseFloat(priceMax);
             }
 
+            if (countryId) {
+                query.country = new mongoose.Types.ObjectId(countryId);
+            }
+
             if (subRegionId) {
                 query.subRegions = { $in: subRegionId.split(",").map(id => new mongoose.Types.ObjectId(id)) };
             }
@@ -128,12 +133,12 @@ export const productService = {
                 query.dryness = new mongoose.Types.ObjectId(drynessId);
             }
 
-            if (sizeTypeId) {
-                query.sizeTypes = { $in: sizeTypeId.split(",").map(id => new mongoose.Types.ObjectId(id)) };
+            if (sizeId) {
+                query.size = new mongoose.Types.ObjectId(sizeId);
             }
 
-            if (collectableId) {
-                query.collectables = { $in: collectableId.split(",").map(id => new mongoose.Types.ObjectId(id)) };
+            if (typeId) {
+                query.type = { $in: typeId.split(",").map(id => new mongoose.Types.ObjectId(id)) };
             }
 
             if (abvMin || abvMax) {
@@ -154,8 +159,21 @@ export const productService = {
                     { path: "categories", select: "name" },
                     { path: "regions", select: "region" },
                     { path: "vintage", select: "year description" },
-                    { path: "sizeTypes", select: "name" },
-                    { path: "collectables", select: "name" },
+                    { path: "dryness", select: "name" },
+                    { path: "size", select: "name" },
+                    { path: "type", select: "name" },
+                    {
+                        path: "country", populate: {
+                            path: "regions",
+                            model: "WineRegion",
+                            select: "region _id",
+                            populate: {
+                                path: "subRegions",
+                                model: "SubRegion",
+                                select: "name _id"
+                            }
+                        }
+                    },
                     { path: "subCategories", select: "name" },
                     { path: "subRegions", select: "name" }
                 ],

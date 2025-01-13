@@ -83,32 +83,35 @@ async function seedCountryWineRegionSubRegion() {
                 // If the country doesn't exist, create a new one
                 country = await Country.create({ name: countryData.country });
                 console.log(`Created country: ${country.name}`);
+
+                // Check if the region already exists
+                let region = await WineRegion.findOne({ region: countryData.regions[0].region });
+                if (!region) {
+                    // If the region doesn't exist, create a new one
+                    region = await WineRegion.create({ region: countryData.regions[0].region });
+                    console.log(`Created region: ${region.region}`);
+                }
+
+                // Update the country's region field
+                country.regions.push(region._id);
+                await country.save();
+
+
+                // Check if the sub-region already exists
+                let subRegion = await SubRegion.findOne({ name: countryData.regions[0].subRegions[0].name });
+                if (!subRegion) {
+                    // If the sub-region doesn't exist, create a new one
+                    subRegion = await SubRegion.create({ name: countryData.regions[0].subRegions[0].name });
+                    console.log(`Created sub-region: ${subRegion.name}`);
+                }
+
+                // Update the region's subRegion field
+                region.subRegions.push(subRegion._id);
+                await region.save();
+            } else {
+                console.log(`Country ${countryData.country} already exists. Skipping seeding.`);
             }
 
-            // Check if the region already exists
-            let region = await WineRegion.findOne({ region: countryData.regions[0].region });
-            if (!region) {
-                // If the region doesn't exist, create a new one
-                region = await WineRegion.create({ region: countryData.regions[0].region });
-                console.log(`Created region: ${region.region}`);
-            }
-
-            // Update the country's region field
-            country.regions.push(region._id);
-            await country.save();
-
-
-            // Check if the sub-region already exists
-            let subRegion = await SubRegion.findOne({ name: countryData.regions[0].subRegions[0].name });
-            if (!subRegion) {
-                // If the sub-region doesn't exist, create a new one
-                subRegion = await SubRegion.create({ name: countryData.regions[0].subRegions[0].name });
-                console.log(`Created sub-region: ${subRegion.name}`);
-            }
-
-            // Update the region's subRegion field
-            region.subRegions.push(subRegion._id);
-            await region.save();
         } catch (error) {
             console.error('Error seeding data for country:', countryData.country, error);
         }
