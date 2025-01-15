@@ -20,22 +20,22 @@ const discountSchema = new mongoose.Schema({
         sparse: true, // Allows multiple `null` values
         trim: true,
     },
-    categoryId: {
+    categoryId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'WineCategory',
         required: function () {
             return this.discountType === 'category';
         },
         sparse: true,
-    },
-    productId: {
+    }],
+    productId: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
         required: function () {
             return this.discountType === 'product';
         },
         sparse: true,
-    },
+    }],
     unitDiscount: {
         type: Number,
         required: true,

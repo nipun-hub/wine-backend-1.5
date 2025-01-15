@@ -247,21 +247,33 @@ export const productService = {
         }
     },
 
-
     // Get paginated Accessories with filters and sorting
     getAllAccessoriesPaginated: async ({ page = 1, limit = 10, }) => {
         try {
-
             const options = {
                 page: parseInt(page, 10),
                 limit: parseInt(limit, 10),
-                populate: [{ path: "categories", select: "name" },
-                { path: "regions", select: "region" },
-                { path: "vintage", select: "year description" },
-                { path: "sizeTypes", select: "name" },
-                { path: "collectables", select: "name" },
-                { path: "subCategories", select: "name" },
-                { path: "subRegions", select: "name" }
+                populate: [
+                    { path: "categories", select: "name" },
+                    { path: "regions", select: "region" },
+                    { path: "vintage", select: "year description" },
+                    { path: "dryness", select: "name" },
+                    { path: "size", select: "name" },
+                    { path: "type", select: "name" },
+                    {
+                        path: "country", populate: {
+                            path: "regions",
+                            model: "WineRegion",
+                            select: "region _id",
+                            populate: {
+                                path: "subRegions",
+                                model: "SubRegion",
+                                select: "name _id"
+                            }
+                        }
+                    },
+                    { path: "subCategories", select: "name" },
+                    { path: "subRegions", select: "name" }
                 ],
             };
 
@@ -290,7 +302,7 @@ export const productService = {
                     // Step 1: Search for a product-specific discount
                     const productDiscounts = await Discount.find({
                         discountType: 'product',
-                        productId: product._id,
+                        productId: { $in: product._id },
                         isActive: true,
                     }).sort({ unitDiscount: -1, packDiscount: -1 });
 
@@ -358,10 +370,23 @@ export const productService = {
                     { path: "categories", select: "name" },
                     { path: "regions", select: "region" },
                     { path: "vintage", select: "year description" },
-                    { path: "sizeTypes", select: "name" },
-                    { path: "collectables", select: "name" },
+                    { path: "dryness", select: "name" },
+                    { path: "size", select: "name" },
+                    { path: "type", select: "name" },
+                    {
+                        path: "country", populate: {
+                            path: "regions",
+                            model: "WineRegion",
+                            select: "region _id",
+                            populate: {
+                                path: "subRegions",
+                                model: "SubRegion",
+                                select: "name _id"
+                            }
+                        }
+                    },
                     { path: "subCategories", select: "name" },
-                    { path: "subRegions", select: "name" },
+                    { path: "subRegions", select: "name" }
                 ],
             };
 
@@ -381,7 +406,7 @@ export const productService = {
                     // Step 1: Search for a product-specific discount
                     const productDiscounts = await Discount.find({
                         discountType: 'product',
-                        productId: product._id,
+                        productId: { $in: product._id },
                         isActive: true,
                     }).sort({ unitDiscount: -1, packDiscount: -1 });
 
@@ -527,10 +552,23 @@ export const productService = {
                 { path: "categories", select: "name" },
                 { path: "regions", select: "region" },
                 { path: "vintage", select: "year description" },
-                { path: "sizeTypes", select: "name" },
-                { path: "collectables", select: "name" },
+                { path: "dryness", select: "name" },
+                { path: "size", select: "name" },
+                { path: "type", select: "name" },
+                {
+                    path: "country", populate: {
+                        path: "regions",
+                        model: "WineRegion",
+                        select: "region _id",
+                        populate: {
+                            path: "subRegions",
+                            model: "SubRegion",
+                            select: "name _id"
+                        }
+                    }
+                },
                 { path: "subCategories", select: "name" },
-                { path: "subRegions", select: "name" },
+                { path: "subRegions", select: "name" }
             ]);
 
             // Map results to include total sales
@@ -548,7 +586,7 @@ export const productService = {
                     // Step 1: Search for a product-specific discount
                     const productDiscounts = await Discount.find({
                         discountType: 'product',
-                        productId: product._id,
+                        productId: { $in: product._id },
                         isActive: true,
                     }).sort({ unitDiscount: -1, packDiscount: -1 });
 
@@ -604,7 +642,6 @@ export const productService = {
             throw new Error(error.message || "Failed to fetch best-selling products");
         }
     },
-
 
     // Delete product by setting isActive to false
     deleteProduct: async (productId) => {

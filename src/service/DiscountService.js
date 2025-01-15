@@ -5,7 +5,9 @@ const discountService = {
     // Get all discounts
     getAll: async () => {
         try {
-            const discounts = await Discount.find().populate('categoryId').populate('productId');
+            const discounts = await Discount.find()
+                .populate({ path: 'categoryId', model: 'WineCategory', select: 'name _id' })
+                .populate({ path: 'productId', model: 'Product', select: 'name _id' });
             return discounts;
         } catch (error) {
             throw new Error(`Error fetching discounts: ${error.message}`);
@@ -15,7 +17,10 @@ const discountService = {
     // Get a discount by its ID
     getById: async (id) => {
         try {
-            const discount = await Discount.findById(id).populate('categoryId').populate('productId');
+            const discount = await Discount.findById(id)
+                .populate({ path: 'categoryId', model: 'WineCategory', select: 'name _id' })
+                .populate({ path: 'productId', model: 'Product', select: 'name _id' });
+
             if (!discount) {
                 throw new Error(`Discount with ID ${id} not found.`);
             }
@@ -28,7 +33,7 @@ const discountService = {
     // Create a new discount
     create: async (discountData) => {
         // Check if the discount name already exists
-        const existingDiscount = await Discount.findOne({discountName: discountData.discountName});
+        const existingDiscount = await Discount.findOne({ discountName: discountData.discountName });
         if (existingDiscount) {
             throw new Error(`Discount with name ${discountData.discountName} already exists.`);
         }
@@ -37,7 +42,6 @@ const discountService = {
             await discount.save();
             return discount;
         } catch (error) {
-            console.log(error);
             throw new Error(`Error creating discount: ${error.message}`);
         }
     },
@@ -46,12 +50,12 @@ const discountService = {
     update: async (id, updateData) => {
         try {
 
-            const existingDiscount = await Discount.findOne({discountName: updateData.discountName});
+            const existingDiscount = await Discount.findOne({ discountName: updateData.discountName });
             if (existingDiscount && existingDiscount._id.toString() !== id) {
                 throw new Error(`Discount with name ${updateData.discountName} already exists.`);
             }
 
-            const updatedDiscount = await Discount.findByIdAndUpdate(id, updateData, {new: true, runValidators: true});
+            const updatedDiscount = await Discount.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
             if (!updatedDiscount) {
                 throw new Error(`Discount with ID ${id} not found.`);
             }
@@ -68,7 +72,7 @@ const discountService = {
             if (!deletedDiscount) {
                 throw new Error(`Discount not found.`);
             }
-            return {message: `Discount deleted successfully.`};
+            return { message: `Discount deleted successfully.` };
         } catch (error) {
             throw new Error(`Error deleting discount: ${error.message}`);
         }
@@ -77,7 +81,7 @@ const discountService = {
     // Activate a discount
     activate: async (id) => {
         try {
-            const updatedDiscount = await Discount.findByIdAndUpdate(id, {isActive: true}, {new: true});
+            const updatedDiscount = await Discount.findByIdAndUpdate(id, { isActive: true }, { new: true });
             if (!updatedDiscount) {
                 throw new Error(`Discount with ID ${id} not found.`);
             }
@@ -93,7 +97,7 @@ const discountService = {
     // Deactivate a discount
     deactivate: async (id) => {
         try {
-            const updatedDiscount = await Discount.findByIdAndUpdate(id, {isActive: false}, {new: true});
+            const updatedDiscount = await Discount.findByIdAndUpdate(id, { isActive: false }, { new: true });
             if (!updatedDiscount) {
                 throw new Error(`Discount with ID ${id} not found.`);
             }
@@ -116,7 +120,7 @@ const discountService = {
                 discountType: 'product',
                 productId: productId,
                 isActive: true,
-            }).sort({unitDiscount: -1, packDiscount: -1});
+            }).sort({ unitDiscount: -1, packDiscount: -1 });
 
             if (productDiscounts) {
                 discounts.push(...productDiscounts); // Add product discounts to the list
@@ -125,14 +129,14 @@ const discountService = {
             // Step 2: Find the product's categories
             const product = await Product.findById(productId).select('categories');
             if (!product) {
-                throw new Error(`Product with ID ${productId} not found.`);
+                return { message: `Product with ID ${productId} not found.`, status: 404, data: null };
             }
 
             if (product.categories && product.categories.length > 0) {
                 // Step 3: Search for category-specific discounts
                 const categoryDiscounts = await Discount.find({
                     discountType: 'category',
-                    categoryId: {$in: product.categories},
+                    categoryId: { $in: product.categories },
                     isActive: true,
                 });
 
@@ -144,7 +148,7 @@ const discountService = {
             // Step 5: Return the single discount with the highest unit discount
             const highestUnitDiscount = discounts.reduce((prev, current) => {
                 return prev.unitDiscount > current.unitDiscount ? prev : current;
-            }, {unitDiscount: 0});
+            }, { unitDiscount: 0 });
 
             return highestUnitDiscount;
 

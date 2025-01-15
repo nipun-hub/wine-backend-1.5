@@ -13,10 +13,10 @@ router.post("/rate/:productId", productController.addRating);
 
 
 // Public routes
-router.get("/:productId", productController.viewSingleProduct);
-router.get("", productController.getAllProductsPaginated);
 router.get("/getAccessories", productController.getAllAccessoriesPaginated);
 router.get("/getGreatForGift", productController.getGreatForGiftPaginated);
 router.get("/getBestSaleProduct", productController.getBestSaleProductPaginated);
+router.get("", productController.getAllProductsPaginated);
+router.get("/:productId", productController.viewSingleProduct);
 
 export default router;

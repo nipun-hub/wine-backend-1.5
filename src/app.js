@@ -16,6 +16,7 @@ import wineCategoryRoutes from "./route/wineCategoryRoutes.js";
 import wineRegionRoutes from "./route/wineRegionRoutes.js";
 import wineDiscountRoutes from "./route/discountRoutes.js";
 import sizeRoutes from "./route/sizeRoutes.js";
+import vintageRoutes from "./route/vintageRoutes.js";
 
 const app = express();
 
@@ -56,5 +57,6 @@ app.use('/v1/wine-categories', wineCategoryRoutes);
 app.use('/v1/wineRegions', wineRegionRoutes);
 app.use('/v1/discount', wineDiscountRoutes);
 app.use('/v1/size', sizeRoutes);
+app.use('/v1/vintage', vintageRoutes);
 
 export default app;

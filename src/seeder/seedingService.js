@@ -36,9 +36,9 @@ async function seedIfEmpty(model, dataList) {
     if (count === 0) {
         console.log(`Seeding ${model.modelName}...`);
         await model.insertMany(dataList);
-        // console.log(`${model.modelName} data seeded successfully.`);
+        console.log(`${model.modelName} data seeded successfully.`);
     } else {
-        // console.log(`${model.modelName} already has data. Skipping seeding.`);
+        console.log(`${model.modelName} already has data. Skipping seeding.`);
     }
 }
 
