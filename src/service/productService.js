@@ -58,8 +58,6 @@ export const productService = {
                 .populate("dryness")
                 .populate("size")
                 .populate("type")
-                // .populate("sizeTypes")
-                // .populate("collectables")
                 .populate("subCategories")
                 .populate("subRegions");
 
@@ -462,59 +460,6 @@ export const productService = {
             throw new Error(error.message || "Failed to fetch products");
         }
     },
-
-    // Get paginated Accessories with filters and sorting
-    // getBestSaleProductPaginated: async ({page = 1, limit = 10}) => {
-    //     try {
-    //
-    //         // Aggregate the most ordered products from the Order collection
-    //         const bestSellingProducts = await Order.aggregate([
-    //             {$unwind: "$products"}, // Flatten the `products` array
-    //             {
-    //                 $group: {
-    //                     _id: "$products.product", // Group by product ID
-    //                     totalQuantity: {$sum: "$products.quantity"}, // Sum quantities
-    //                 },
-    //             },
-    //             {$sort: {totalQuantity: -1}}, // Sort by total quantity (descending)
-    //             {$limit: parseInt(limit, 10)}, // Limit the results
-    //         ]) || [{}];
-    //
-    //         // Check if aggregation result exists
-    //         if (!bestSellingProducts || bestSellingProducts.length === 0) {
-    //             // console.log("No best-selling products found.");
-    //             return [];
-    //         }
-    //
-    //         // Extract product IDs
-    //         const productIds = bestSellingProducts.map((item) => item._id);
-    //
-    //
-    //         // Fetch product details from the Product collection
-    //         const products = await Product.find({_id: {$in: productIds}}).populate([
-    //             {path: "categories", select: "name"},
-    //             {path: "regions", select: "region"},
-    //             {path: "vintage", select: "year description"},
-    //             {path: "sizeTypes", select: "name"},
-    //             {path: "collectables", select: "name"},
-    //             {path: "subCategories", select: "name"},
-    //             {path: "subRegions", select: "name"},
-    //         ]);
-    //
-    //         // Map results to include total sales
-    //         const result = bestSellingProducts.map((item) => {
-    //             const product = products.find((prod) => prod._id.equals(item._id));
-    //             return product
-    //                 ? {...product.toObject(), totalQuantitySold: item.totalQuantity}
-    //                 : null;
-    //         }).filter(Boolean);
-    //
-    //         return result;
-    //     } catch (error) {
-    //         console.error("Error fetching best-selling products:", error);
-    //         throw new Error(error.message || "Failed to fetch best-selling products");
-    //     }
-    // },
 
     getBestSaleProductPaginated: async ({ page = 1, limit = 10 }) => {
         try {

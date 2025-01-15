@@ -1,5 +1,5 @@
-import { productService } from "../service/productService.js";
-import { errorResponse, successResponse } from "../util/responseUtil.js";
+import {productService} from "../service/productService.js";
+import {errorResponse, successResponse} from "../util/responseUtil.js";
 
 export const productController = {
     // Add new product
@@ -16,7 +16,7 @@ export const productController = {
 
     // Update product
     updateProduct: async (req, res) => {
-        const { productId } = req.params;
+        const {productId} = req.params;
         const productData = req.body;
 
         try {
@@ -29,7 +29,7 @@ export const productController = {
 
     // View single product
     viewSingleProduct: async (req, res) => {
-        const { productId } = req.params;
+        const {productId} = req.params;
 
         try {
             const product = await productService.viewSingleProduct(productId);
@@ -110,7 +110,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -144,7 +145,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -207,7 +209,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -241,7 +244,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -309,7 +313,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -343,7 +348,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -411,7 +417,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -445,7 +452,8 @@ export const productController = {
                         subRegions,
                         country,
                         vintage,
-                        sizeTypes,
+                        size,
+                        type,
                         abv,
                         collectables,
                         image,
@@ -480,7 +488,7 @@ export const productController = {
 
     // Delete product by setting isActive to false
     deleteProduct: async (req, res) => {
-        const { productId } = req.params;
+        const {productId} = req.params;
 
         try {
             const updatedProduct = await productService.deleteProduct(productId);
@@ -492,8 +500,8 @@ export const productController = {
 
     // Add rating
     addRating: async (req, res) => {
-        const { productId } = req.params;
-        const { rating } = req.body;
+        const {productId} = req.params;
+        const {rating} = req.body;
 
         try {
             if (typeof rating !== "number" || rating < 0 || rating > 5) {
