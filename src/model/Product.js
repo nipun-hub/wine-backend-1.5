@@ -17,29 +17,27 @@ const productSchema = new mongoose.Schema(
             ref: 'Country',
             required: true,
         },
-        regions: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'WineRegion',
-                required: true,
-            },
-        ],
-        subRegions: [{
+        regions:
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'WineRegion',
+            required: true,
+        },
+        subRegions: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'SubRegion',
-        }],
+        },
 
-        categories: [{
+        categories: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'WineCategory',
             required: true,
-        }],
-        subCategories: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'SubCategory',
-            },
-        ],
+        },
+        subCategories: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'SubCategory',
+        },
+
         vintage: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Vintage',
