@@ -1,5 +1,6 @@
 import WineRegion from '../model/WineRegion.js';
 import SubRegion from "../model/SubRegion.js";
+import Country from '../model/Country.js';
 
 export const wineRegionService = {
     getAll: async () => {
@@ -11,63 +12,42 @@ export const wineRegionService = {
         }
     },
 
-    save: async (wineRegionsData) => {
+    add: async (id, region) => {
         try {
-            const count = await WineRegion.countDocuments();
-            if (count === 0) {
-                await WineRegion.insertMany(wineRegionsData);
-                return "Wine Regions seeded successfully.";
-            }
-            return "Wine Regions already have data. Skipping seeding.";
-        } catch (error) {
-            throw new Error(`Error saving Wine Regions: ${error.message}`);
-        }
-    },
 
-    add: async (regionData) => {
-        try {
+            const country = await Country.findById(id);
+            if (!country) {
+                throw new Error("Country not found.");
+            }
+
             // Validate input
-            if (!regionData || !regionData.region) {
+            if (!region) {
                 throw new Error("Invalid region data. A 'region' field is required.");
             }
 
             // Check if the region already exists
-            const existingRegion = await WineRegion.findOne({region: regionData.region.trim()});
+            const existingRegion = await WineRegion.findOne({ region: region.trim() });
             if (existingRegion) {
-                return `Wine Region "${regionData.region}" already exists.`;
+                throw new Error(`Wine Region ${region} already exists.`)
             }
 
             // Create the WineRegion
-            const newRegion = new WineRegion({region: regionData.region});
+            const newRegion = new WineRegion({ region: region });
             await newRegion.save();
 
-            // If subRegions are provided, create and associate them
-            if (regionData.subRegions && Array.isArray(regionData.subRegions) && regionData.subRegions.length > 0) {
-                const subRegionIds = [];
-                for (const subRegionName of regionData.subRegions) {
-                    const subRegion = new SubRegion({name: subRegionName, mainRegionId: newRegion._id});
-                    await subRegion.save(); // Save each sub-region
-                    subRegionIds.push(subRegion._id);
-                }
+            // add region to country
+            country.regions.push(newRegion._id);
+            await country.save();
 
-                // Update the WineRegion with the associated sub-regions
-                newRegion.subRegions = subRegionIds;
-                await newRegion.save();
-            }
-
-            return `Wine Region "${regionData.region}" and associated sub-regions added successfully.`;
+            return { success: true, message: `Wine Region ${region} added successfully.`, newRegion };
         } catch (error) {
-            console.error("Error in wineRegionService.add:", error);
             throw new Error(`Error adding Wine Region: ${error.message}`);
         }
     },
 
-    updateRegion: async (regionId, regionData) => {
+
+    update: async (regionId, region) => {
         try {
-            // Validate the input
-            if (!regionId || !regionData) {
-                throw new Error("Region ID and region data are required.");
-            }
 
             // Find the existing WineRegion by its ID
             const existingRegion = await WineRegion.findById(regionId);
@@ -75,26 +55,14 @@ export const wineRegionService = {
                 throw new Error("Wine Region not found.");
             }
 
-            // Update the region name if it's provided
-            if (regionData.region) {
-                existingRegion.region = regionData.region;
+            const checkExist = await WineRegion.findOne({ region });
+            if (checkExist && checkExist._id != regionId) {
+                throw new Error("Region are already exist ")
             }
 
-            // Handle sub-regions update
-            if (regionData.subRegions) {
-                // Remove old sub-regions
-                await SubRegion.deleteMany({mainRegionId: existingRegion._id});
-
-                // Create and save new sub-regions
-                const subRegionIds = [];
-                for (const subRegionName of regionData.subRegions) {
-                    const subRegion = new SubRegion({name: subRegionName, mainRegionId: existingRegion._id});
-                    await subRegion.save();
-                    subRegionIds.push(subRegion._id);
-                }
-
-                // Update the subRegions in the WineRegion
-                existingRegion.subRegions = subRegionIds;
+            // Update the region name if it's provided
+            if (region) {
+                existingRegion.region = region;
             }
 
             // Save the updated WineRegion document
@@ -136,7 +104,7 @@ export const wineRegionService = {
             }
 
             // Delete associated sub-regions
-            await SubRegion.deleteMany({mainRegionId: deletedRegion._id});
+            await SubRegion.deleteMany({ mainRegionId: deletedRegion._id });
 
             return {
                 message: "Wine Region deleted successfully.",

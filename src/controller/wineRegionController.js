@@ -1,5 +1,5 @@
-import {wineRegionService} from '../service/wineRegionService.js';
-import {successResponse, errorResponse} from '../util/responseUtil.js';
+import { wineRegionService } from '../service/wineRegionService.js';
+import { successResponse, errorResponse } from '../util/responseUtil.js';
 
 export const wineRegionController = {
     getAll: async (req, res) => {
@@ -11,41 +11,39 @@ export const wineRegionController = {
         }
     },
 
-    save: async (req, res) => {
-        try {
-            const message = await wineRegionService.save(req.body.wineRegionsData);
-            return successResponse(res, message, null, 200);
-        } catch (error) {
-            return errorResponse(res, error.message, 500);
-        }
-    },
-
-    addRegion: async (req, res) => {
+    add: async (req, res) => {
         try {
             // Extract region data from the request body
-            const regionData = req.body;
+            const id = req.params.countryId;
+            const { region } = req.body;
+
+            if (!region) {
+                return errorResponse(res, error.message, 400);
+            }
 
             // Call the service to add a new region
-            const message = await wineRegionService.add(regionData);
-
+            const message = await wineRegionService.add(id, region);
             // Respond with success
-            return successResponse(res, message, null, 201); // HTTP 201 for created resource
+            return successResponse(res, message.message, message.newRegion, 201); // HTTP 201 for created resource
         } catch (error) {
             // Handle errors
             return errorResponse(res, error.message, 500);
         }
     },
 
-    updateRegion: async (req, res) => {
+    update: async (req, res) => {
         try {
             // Extract the Wine Region ID from the URL params and data from the request body
             const regionId = req.params.regionId;
-            const regionData = req.body;
+            const { region } = req.body;
+
+            if (!region) {
+                return errorResponse(res, "region is required.")
+            }
 
             // Call the updateRegion service
-            const message = await wineRegionService.updateRegion(regionId, regionData);
-
-
+            const message = await wineRegionService.update(regionId, region);
+            console.log(message);
             // Return success response
             return successResponse(res, message, null, 200);  // 200 OK status for successful update
         } catch (error) {

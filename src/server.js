@@ -12,7 +12,7 @@ async function startServer() {
     try {
         await dbConfig();
         // await seedInitialData();
-        await seedInitialData();
+        // await seedInitialData();
         app.listen(PORT, () => {
             console.log(`Service running on port ${PORT}`);
         });

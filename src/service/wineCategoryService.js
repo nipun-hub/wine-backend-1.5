@@ -33,8 +33,8 @@ export const wineCategoryService = {
             // Find the category and update the margin
             const updatedCategory = await WineCategory.findByIdAndUpdate(
                 id,
-                {margin: newMargin},
-                {new: true, runValidators: true} // Return updated document and apply validators
+                { margin: newMargin },
+                { new: true, runValidators: true } // Return updated document and apply validators
             );
 
             if (!updatedCategory) {
@@ -104,8 +104,8 @@ export const wineCategoryService = {
             // Find and update the subcategory name
             const updatedSubCategory = await SubCategory.findByIdAndUpdate(
                 subCategoryId,
-                {$set: {name: newName}},
-                {new: true, runValidators: true}
+                { $set: { name: newName } },
+                { new: true, runValidators: true }
             );
 
             if (!updatedSubCategory) {
@@ -134,8 +134,8 @@ export const wineCategoryService = {
             // Remove the subcategory from the wine category
             const wineCategory = await WineCategory.findByIdAndUpdate(
                 deletedSubCategory.mainCategoryId,
-                {$pull: {subCategories: deletedSubCategory._id}},
-                {new: true}
+                { $pull: { subCategories: deletedSubCategory._id } },
+                { new: true }
             );
 
             return deletedSubCategory;
