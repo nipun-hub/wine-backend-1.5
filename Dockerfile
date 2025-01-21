@@ -1,4 +1,4 @@
-# base image added
+# base image
 FROM node:20-alpine
 
 # set working directory
