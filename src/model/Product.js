@@ -100,12 +100,6 @@ const productSchema = new mongoose.Schema(
             required: function () {
                 return this.isPack;
             },
-            validate: {
-                validator: function (v) {
-                    return v && v.length > 0;
-                },
-                message: 'At least one pack details is required if isPack is true'
-            },
             default: undefined,
             of: {
                 packSize: {
