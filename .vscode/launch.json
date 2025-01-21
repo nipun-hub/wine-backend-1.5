@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "https://prod.liveshare.vsengsaas.visualstudio.com/join?5860BF9F92C76D3484089078E7A48FD7D22E",
+            "request": "launch",
+            "url": "https://prod.liveshare.vsengsaas.visualstudio.com/join?5860BF9F92C76D3484089078E7A48FD7D22E"
+        }
+    ]
+}
