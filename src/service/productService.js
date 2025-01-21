@@ -3,7 +3,7 @@ import Product from "../model/Product.js";
 import WineCategory from "../model/WineCategory.js";
 import Order from "../model/Order.js";
 import Discount from "../model/Discount.js";
-import { paginate } from "mongoose-paginate-v2";
+import Vintage from "../model/Vintage.js";
 
 export const productService = {
     // Add a new product
@@ -15,8 +15,21 @@ export const productService = {
                 throw new Error("A product with the same name already exists");
             }
 
-            const newProduct = await Product.create(productData);
+            // if vintage calculate
+            let vintage = await Vintage.findOne({ year: productData.vintage });
+
+            if (!vintage) {
+                const newVintage = new Vintage({ year: productData.vintage });
+                await newVintage.save();
+                vintage = newVintage;
+            }
+
+            const newProduct = new Product({ ...productData, vintage: vintage._id });
+            await newProduct.save();
             return newProduct;
+
+            // const newProduct = await Product.create(productData);
+            // return newProduct;
         } catch (error) {
             throw new Error(error.message || "Failed to add product");
         }
