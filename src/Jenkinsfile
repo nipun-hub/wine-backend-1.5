@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                retry(3) {
+                    git branch: 'master', url: 'https://github.com/nipun-hub/wine-backend-1.5'
+                }
+            }
+        }
+        stage('Build docker image') {
+            steps {
+                bat 'docker build -t hemal2003/central-wine-backend:%BUILD_NUMBER% .'
+                // for linux sh
+            }
+        }
+        stage('login to dockerhub') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerHubPassword', variable: 'dockerHubPassword')]) {
+                    bat 'docker login -u hemal2003 -p %dockerHubPassword%'
+                }
+            }
+        }
+        stage('Push docker image') {
+            steps {
+                bat 'docker push hemal2003/central-wine-backend:%BUILD_NUMBER%'
+                // for linux sh
+            }
+        }
+    }
+    post {
+        always {
+            bat 'docker logout'
+        }
+    }
+}

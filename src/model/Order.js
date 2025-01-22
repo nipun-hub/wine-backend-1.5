@@ -19,6 +19,17 @@ const orderSchema = new mongoose.Schema({
                 required: true,
                 min: 1,
             },
+            isPack: {
+                type: Boolean,
+                default: false
+            },
+            packSize: {
+                type: Number,
+                required: function () {
+                    return this.isPack;
+                },
+                min: 0,
+            },
         },
     ],
     totalAmount: {
@@ -82,7 +93,7 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-}, {timestamps: true});
+}, { timestamps: true });
 
 orderSchema.plugin(mongoosePaginate);
 

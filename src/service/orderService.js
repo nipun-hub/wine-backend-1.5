@@ -7,18 +7,18 @@ import Discount from "../model/Discount.js";
 export const orderService = {
     // Place an order
     createOrder: async ({
-                            userId,
-                            products,
-                            totalAmount,
-                            shippingAddress,
-                            mobileNumber,
-                            paymentMethod,
-                            userComments,
-                            deliveryType,
-                            deliveryDate,
-                            editable,
-                            paymentId,
-                        }) => {
+        userId,
+        products,
+        totalAmount,
+        shippingAddress,
+        mobileNumber,
+        paymentMethod,
+        userComments,
+        deliveryType,
+        deliveryDate,
+        editable,
+        paymentId,
+    }) => {
         try {
             if (!products || !Array.isArray(products) || products.length === 0) {
                 throw new Error("Products array is empty or invalid.");
@@ -43,8 +43,8 @@ export const orderService = {
             for (let item of products) {
                 await Product.findByIdAndUpdate(
                     item.product,
-                    {$inc: {qtyOnHand: -item.quantity}},
-                    {new: true}
+                    { $inc: { qtyOnHand: -item.quantity } },
+                    { new: true }
                 );
             }
 
@@ -53,6 +53,8 @@ export const orderService = {
                 products: products.map((p) => ({
                     product: p.product,
                     quantity: p.quantity,
+                    isPack: (p.isPack) ? p.isPack : false,
+                    packSize: (p.packSize) ? p.packSize : 0
                 })),
                 totalAmount,
                 shippingAddress,
@@ -87,7 +89,7 @@ export const orderService = {
     },
 
     // Get all orders
-    getAllOrders: async ({page, limit, sortBy, sortOrder, filters}) => {
+    getAllOrders: async ({ page, limit, sortBy, sortOrder, filters }) => {
         try {
             const query = {};
 
@@ -99,12 +101,12 @@ export const orderService = {
             }
 
             const options = {
-                sort: {[sortBy]: sortOrder === "desc" ? -1 : 1},
+                sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 },
                 page: parseInt(page, 10),
                 limit: parseInt(limit, 10),
                 populate: [
-                    {path: "user", select: "firstName lastName email"},
-                    {path: "products.product"},
+                    { path: "user", select: "firstName lastName email" },
+                    { path: "products.product" },
                 ],
             };
 
@@ -153,7 +155,7 @@ export const orderService = {
                                 discountType: 'product',
                                 productId: product._id,
                                 isActive: true,
-                            }).sort({unitDiscount: -1, packDiscount: -1});
+                            }).sort({ unitDiscount: -1, packDiscount: -1 });
 
                             if (productDiscounts) {
                                 discounts.push(...productDiscounts); // Add product discounts to the list
@@ -163,7 +165,7 @@ export const orderService = {
                                 // Step 3: Search for category-specific discounts
                                 const categoryDiscounts = await Discount.find({
                                     discountType: 'category',
-                                    categoryId: {$in: product.categories},
+                                    categoryId: { $in: product.categories },
                                     isActive: true,
                                 });
 
@@ -185,7 +187,7 @@ export const orderService = {
                                         packDiscount: prev.packDiscount,
                                         discountName: prev.discountName
                                     };
-                            }, {unitDiscount: 0, packDiscount: 0, discountName: ''});
+                            }, { unitDiscount: 0, packDiscount: 0, discountName: '' });
 
                             return {
                                 ...singleProduct,
@@ -225,8 +227,8 @@ export const orderService = {
 
             const updatedOrder = await Order.findByIdAndUpdate(
                 orderId,
-                {status, statusMessage, updatedAt: Date.now()},
-                {new: true}
+                { status, statusMessage, updatedAt: Date.now() },
+                { new: true }
             );
 
             if (!updatedOrder) {
@@ -240,9 +242,9 @@ export const orderService = {
     },
 
     // get all orders by user
-    userOrderHistory: async ({userId, page, limit}) => {
+    userOrderHistory: async ({ userId, page, limit }) => {
         try {
-            const query = {user: userId};
+            const query = { user: userId };
 
             const user = await User.findById(userId);
             if (!user) {
@@ -254,7 +256,7 @@ export const orderService = {
                 limit: parseInt(limit, 10),
                 populate: [
                     // {path: 'user', select: 'firstName lastName email'},
-                    {path: "products.product"},
+                    { path: "products.product" },
                 ],
             };
             const orders = await Order.paginate(query, options);
@@ -323,8 +325,8 @@ export const orderService = {
 
             const updatedOrder = await Order.findByIdAndUpdate(
                 orderId,
-                {$set: updates},
-                {new: true}
+                { $set: updates },
+                { new: true }
             ).populate("products.product", "name description price");
 
             return updatedOrder;

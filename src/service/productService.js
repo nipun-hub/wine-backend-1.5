@@ -78,7 +78,55 @@ export const productService = {
                 throw new Error("Product not found");
             }
 
-            return product;
+
+            // Add discount for each product
+            const discounts = [];
+
+            // Step 1: Search for a product-specific discount
+            const productDiscounts = await Discount.find({
+                discountType: 'product',
+                productId: product._id,
+                isActive: true,
+            }).sort({ unitDiscount: -1, packDiscount: -1 });
+
+            if (productDiscounts) {
+                discounts.push(...productDiscounts); // Add product discounts to the list
+            }
+
+            if (product.categories) {
+                // Step 3: Search for category-specific discounts
+                const categoryDiscounts = await Discount.find({
+                    discountType: 'category',
+                    categoryId: { $in: product.categories._id },
+                    isActive: true,
+                });
+
+                if (categoryDiscounts && categoryDiscounts.length > 0) {
+                    discounts.push(...categoryDiscounts); // Add all category discounts to the list
+                }
+            }
+
+            // Calculate the maximum discount
+            const maxDiscount = discounts.reduce((prev, current) => {
+                return current.unitDiscount > prev.unitDiscount
+                    ? {
+                        unitDiscount: current.unitDiscount,
+                        packDiscount: current.packDiscount,
+                        discountName: current.discountName
+                    }
+                    : {
+                        unitDiscount: prev.unitDiscount,
+                        packDiscount: prev.packDiscount,
+                        discountName: prev.discountName
+                    };
+            }, { unitDiscount: 0, packDiscount: 0, discountName: '' });
+
+
+            return {
+                ...product.toObject(),
+                ...maxDiscount,
+            };
+
         } catch (error) {
             // console.log(error)
             throw new Error(error.message || "Failed to fetch product");
@@ -208,11 +256,11 @@ export const productService = {
                         discounts.push(...productDiscounts); // Add product discounts to the list
                     }
 
-                    if (product.categories && product.categories.length > 0) {
+                    if (product.categories) {
                         // Step 3: Search for category-specific discounts
                         const categoryDiscounts = await Discount.find({
                             discountType: 'category',
-                            categoryId: { $in: product.categories },
+                            categoryId: { $in: product.categories._id },
                             isActive: true,
                         });
 
@@ -321,11 +369,11 @@ export const productService = {
                         discounts.push(...productDiscounts); // Add product discounts to the list
                     }
 
-                    if (product.categories && product.categories.length > 0) {
+                    if (product.categories) {
                         // Step 3: Search for category-specific discounts
                         const categoryDiscounts = await Discount.find({
                             discountType: 'category',
-                            categoryId: { $in: product.categories },
+                            categoryId: { $in: product.categories._id },
                             isActive: true,
                         });
 
@@ -401,7 +449,7 @@ export const productService = {
                 ],
             };
 
-            const query = { isGreatForGift: true };
+            const query = { greatForGift: true };
 
             const products = await Product.paginate(query, options);
 
@@ -425,11 +473,11 @@ export const productService = {
                         discounts.push(...productDiscounts); // Add product discounts to the list
                     }
 
-                    if (product.categories && product.categories.length > 0) {
+                    if (product.categories) {
                         // Step 3: Search for category-specific discounts
                         const categoryDiscounts = await Discount.find({
                             discountType: 'category',
-                            categoryId: { $in: product.categories },
+                            categoryId: { $in: product.categories._id },
                             isActive: true,
                         });
 
@@ -552,11 +600,11 @@ export const productService = {
                         discounts.push(...productDiscounts); // Add product discounts to the list
                     }
 
-                    if (product.categories && product.categories.length > 0) {
+                    if (product.categories) {
                         // Step 3: Search for category-specific discounts
                         const categoryDiscounts = await Discount.find({
                             discountType: 'category',
-                            categoryId: { $in: product.categories },
+                            categoryId: { $in: product.categories._id },
                             isActive: true,
                         });
 

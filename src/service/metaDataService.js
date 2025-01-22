@@ -38,11 +38,11 @@ export const metaDataService = {
       });
 
       // Populate subRegions for each WineRegion
-      // const wineRegions = await WineRegion.find().populate({
-      //   path: 'subRegions',
-      //   model: SubRegion, // Ensure this matches your SubRegion model name
-      //   select: 'name _id', // Only fetch necessary fields
-      // });
+      const wineRegions = await WineRegion.find().populate({
+        path: 'subRegions',
+        model: SubRegion, // Ensure this matches your SubRegion model name
+        select: 'name _id', // Only fetch necessary fields
+      });
 
       const vintages = await Vintage.find();
       const membershipPlans = await MembershipPlan.find();
@@ -54,7 +54,7 @@ export const metaDataService = {
         drynessLevels,
         wineCategories,
         country,
-        // wineRegions,
+        wineRegions,
         vintages,
         membershipPlans,
       };
