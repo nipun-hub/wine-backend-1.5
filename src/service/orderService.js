@@ -144,7 +144,7 @@ export const orderService = {
             );
 
             const updatedOrder = await Promise.all(
-                orders.docs.map(async order => {
+                orders?.docs?.map(async order => {
                     const updatedProducts = await Promise.all(
                         order.products.map(async singleProduct => {
                             const product = await singleProduct.product;
@@ -153,7 +153,7 @@ export const orderService = {
                             // Step 1: Search for a product-specific discount
                             const productDiscounts = await Discount.find({
                                 discountType: 'product',
-                                productId: product._id,
+                                productId: { $in: product?._id },
                                 isActive: true,
                             }).sort({ unitDiscount: -1, packDiscount: -1 });
 
@@ -161,11 +161,11 @@ export const orderService = {
                                 discounts.push(...productDiscounts); // Add product discounts to the list
                             }
 
-                            if (product.categories && product.categories.length > 0) {
+                            if (product?.categories) {
                                 // Step 3: Search for category-specific discounts
                                 const categoryDiscounts = await Discount.find({
                                     discountType: 'category',
-                                    categoryId: { $in: product.categories },
+                                    categoryId: { $in: product?.categories?._id },
                                     isActive: true,
                                 });
 
@@ -211,7 +211,7 @@ export const orderService = {
                 docs: updatedOrder
             };
         } catch (error) {
-            // console.log(error)
+            console.log(error)
             throw new Error(error.message || "Failed to fetch orders.");
         }
     },
