@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const dbConfig = async () => {
   // const mongoUri = process.env.MONGODB_URI;
-  const mongoUri = 'mongodb+srv://AventureIT123:AventureIT123@cluster0.6lvjymw.mongodb.net/Central_Dev?retryWrites=true&w=majority&appName=Cluster0';
+  // mongodb+srv://AventureIT123:AventureIT123@cluster0.6lvjymw.mongodb.net/Central_Dev?retryWrites=true&w=majority&appName=Cluster0
+  const mongoUri = 'mongodb://admin:password@38.242.231.202:27017/wine?authSource=admin';
   if (!mongoUri) {
     throw new Error('MONGODB_URI environment variable not set');
   }
