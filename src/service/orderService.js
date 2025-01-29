@@ -78,11 +78,94 @@ export const orderService = {
         try {
             const order = await Order.findById(orderId)
                 .populate("user")
-                .populate("products.product");
+                .populate("products.product")
+                .populate({ path: "products.product", populate: { path: "size" } });
+
             if (!order) {
                 throw new Error("Order not found.");
             }
-            return order;
+
+            let shippingAddress = {};
+
+            try {
+                if (order.shippingAddress) {
+                    const userAddress = await UserAddress.findOne({
+                        userId: order.user._id,
+                    });
+
+                    if (userAddress) {
+                        const address = userAddress.addresses.id(order.shippingAddress);
+
+                        if (address) {
+                            shippingAddress = address;
+                        } else {
+                            shippingAddress = null;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching shipping address:", error);
+            }
+
+            const updatedProducts = await Promise.all(
+                order.products.map(async singleProduct => {
+                    const product = await singleProduct.product;
+                    const discounts = [];
+
+                    // Step 1: Search for a product-specific discount
+                    const productDiscounts = await Discount.find({
+                        discountType: 'product',
+                        productId: { $in: product?._id },
+                        isActive: true,
+                    }).sort({ unitDiscount: -1, packDiscount: -1 });
+
+                    if (productDiscounts) {
+                        discounts.push(...productDiscounts); // Add product discounts to the list
+                    }
+
+                    if (product?.categories) {
+                        // Step 3: Search for category-specific discounts
+                        const categoryDiscounts = await Discount.find({
+                            discountType: 'category',
+                            categoryId: { $in: product?.categories?._id },
+                            isActive: true,
+                        });
+
+                        if (categoryDiscounts && categoryDiscounts.length > 0) {
+                            discounts.push(...categoryDiscounts); // Add all category discounts to the list
+                        }
+                    }
+
+                    // Calculate the maximum discount
+                    const maxDiscount = discounts.reduce((prev, current) => {
+                        return current.unitDiscount > prev.unitDiscount
+                            ? {
+                                unitDiscount: current.unitDiscount,
+                                packDiscount: current.packDiscount,
+                                discountName: current.discountName
+                            }
+                            : {
+                                unitDiscount: prev.unitDiscount,
+                                packDiscount: prev.packDiscount,
+                                discountName: prev.discountName
+                            };
+                    }, { unitDiscount: 0, packDiscount: 0, discountName: '' });
+
+                    return {
+                        ...singleProduct.toObject(),
+                        product: {
+                            ...product.toObject(),
+                            ...maxDiscount,
+                        },
+                    };
+                })
+            );
+
+            return {
+                ...order.toObject(),
+                shippingAddress,
+                products: updatedProducts,
+            };
         } catch (error) {
             throw new Error(error.message || "Order fetch failed.");
         }
