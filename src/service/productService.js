@@ -38,6 +38,19 @@ export const productService = {
     // Update an existing product
     updateProduct: async (productId, productData) => {
         try {
+
+            let vintage = await Vintage.findOne({ year: productData.vintage });
+
+            if (!vintage) {
+                const newVintage = new Vintage({ year: productData.vintage });
+                await newVintage.save();
+                vintage = newVintage;
+            }
+
+            console.log(vintage)
+
+            productData.vintage = vintage._id;
+
             const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
             if (!updatedProduct) {
                 throw new Error("Product not found");
