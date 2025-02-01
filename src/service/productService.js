@@ -47,7 +47,7 @@ export const productService = {
                 vintage = newVintage;
             }
 
-            console.log(vintage)
+            // console.log(vintage)
 
             productData.vintage = vintage._id;
 
@@ -251,6 +251,8 @@ export const productService = {
                 ],
             };
 
+            // console.log(query)
+
             const products = await Product.paginate(query, options);
 
             // Add discount for each product
@@ -355,7 +357,7 @@ export const productService = {
                 throw new Error("Accessories category not found");
             }
 
-            const query = {};
+            const query = { isActive: true };
             if (accessoriesId) {
                 query.categories = accessoriesId; // Apply filter for category
             }
@@ -462,7 +464,7 @@ export const productService = {
                 ],
             };
 
-            const query = { greatForGift: true };
+            const query = { greatForGift: true, isActive: true };
 
             const products = await Product.paginate(query, options);
 
@@ -567,7 +569,7 @@ export const productService = {
             const productIds = paginatedProducts.map((item) => item._id);
 
             // Fetch product details from the Product collection
-            const products = await Product.find({ _id: { $in: productIds } }).populate([
+            const products = await Product.find({ _id: { $in: productIds }, isActive: true }).populate([
                 { path: "categories", select: "name" },
                 { path: "regions", select: "region" },
                 { path: "vintage", select: "year description" },
