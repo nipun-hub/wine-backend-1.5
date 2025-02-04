@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 
 const vintageSchema = new mongoose.Schema({
   year: {
-    type: Number,
-    required: true,
+    type: String,
     unique: true,
   },
   description: {
@@ -11,7 +10,7 @@ const vintageSchema = new mongoose.Schema({
     required: false,
     trim: true,
   },
-}, { 
+}, {
   timestamps: true,
   strict: true,
 });

@@ -15,16 +15,22 @@ export const productService = {
                 throw new Error("A product with the same name already exists");
             }
 
-            // if vintage calculate
-            let vintage = await Vintage.findOne({ year: productData.vintage });
+            const newProduct = new Product(productData);
 
-            if (!vintage) {
-                const newVintage = new Vintage({ year: productData.vintage });
-                await newVintage.save();
-                vintage = newVintage;
+            // if vintage calculate
+            if (productData.vintage) {
+                let vintage = await Vintage.findOne({ year: productData.vintage });
+
+                if (!vintage) {
+                    const newVintage = new Vintage({ year: productData.vintage });
+                    await newVintage.save();
+                    vintage = newVintage;
+                }
+
+                newProduct.vintage = vintage._id;
             }
 
-            const newProduct = new Product({ ...productData, vintage: vintage._id });
+
             await newProduct.save();
             return newProduct;
 
@@ -39,17 +45,19 @@ export const productService = {
     updateProduct: async (productId, productData) => {
         try {
 
-            let vintage = await Vintage.findOne({ year: productData.vintage });
+            if (productData.vintage) {
+                let vintage = await Vintage.findOne({ year: productData.vintage });
 
-            if (!vintage) {
-                const newVintage = new Vintage({ year: productData.vintage });
-                await newVintage.save();
-                vintage = newVintage;
+                if (!vintage) {
+                    const newVintage = new Vintage({ year: productData.vintage });
+                    await newVintage.save();
+                    vintage = newVintage;
+                }
+                productData.vintage = vintage._id;
             }
 
             // console.log(vintage)
 
-            productData.vintage = vintage._id;
 
             const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
             if (!updatedProduct) {
