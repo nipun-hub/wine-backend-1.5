@@ -1,7 +1,7 @@
 # base image
 FROM node:20-alpine
 
-# set working direc
+# set working dir
 WORKDIR /app
 
 # copy package.json and package-lock.json
