@@ -11,7 +11,7 @@ export const productService = {
         try {
             // Check if a product with the same name already exists
             const existingProduct = await Product.findOne({ name: productData.name });
-            if (existingProduct) {
+            if (existingProduct && existingProduct.isActive) {
                 throw new Error("A product with the same name already exists");
             }
 
