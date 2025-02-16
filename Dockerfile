@@ -10,7 +10,7 @@ COPY package*.json ./
 # install dependencies
 RUN npm install
 
-# copy source code
+# copy source cod
 COPY . .
 
 # expose port
