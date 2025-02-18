@@ -44,7 +44,7 @@ app.get("/v1/health-check", (req, res) => {
 });
 
 // Routes
-app.use('/v1/meta-data', metaDataRoutes);
+app.use('/', metaDataRoutes);
 app.use('/v1/images', imageRoutes);
 app.use('/v1/users', userRoutes);
 app.use('/v1/products', productRoutes);
