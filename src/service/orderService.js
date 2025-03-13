@@ -183,6 +183,24 @@ export const orderService = {
                 query.user = filters.userId;
             }
 
+            if (filters.search && filters.search.trim() !== "") {
+                query.$or = [
+                    { mobileNumber: { $regex: filters.search, $options: "i" } },
+                    {
+                        user: {
+                            $in: await User.find({
+                                $or: [
+                                    { firstName: { $regex: filters.search, $options: "i" } },
+                                    { lastName: { $regex: filters.search, $options: "i" } },
+                                    { email: { $regex: filters.search, $options: "i" } },
+                                ],
+                                // isActive: true, // Check if user is active
+                            }).distinct("_id"),
+                        },
+                    },
+                ];
+            }
+
             const options = {
                 sort: { [sortBy]: sortOrder === "desc" ? -1 : 1 },
                 page: parseInt(page, 10),
