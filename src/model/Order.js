@@ -1,11 +1,18 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
+import { v4 as uuidv4 } from 'uuid';
 
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
+    },
+    orderNumber: {
+        type: String,
+        required: true,
+        unique: true,
+        default: () => uuidv4(), // Auto-generate UUID for orderNumber
     },
     products: [
         {

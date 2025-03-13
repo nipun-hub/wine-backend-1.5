@@ -6,13 +6,12 @@ import seedInitialData from './seeder/seedingService.js';
 
 dotenv.config();
 
-const PORT = 3100;
-
 async function startServer() {
     try {
         await dbConfig();
         // await seedInitialData();
         // await seedInitialData();
+        const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
             console.log(`Service running on port ${PORT}`);
         });

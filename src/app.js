@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import {errorLogger} from "./middleware/errorLogger.js";
+import { errorLogger } from "./middleware/errorLogger.js";
 import userRoutes from './route/userRoutes.js';
 import metaDataRoutes from './route/metaDataRoutes.js';
 import imageRoutes from './route/imageRoutes.js';
@@ -40,7 +40,7 @@ app.use(errorLogger);
 
 // Health-check route
 app.get("/v1/health-check", (req, res) => {
-    res.status(200).json({status: "Server is up and running"});
+    res.status(200).json({ status: "Server is up and running" });
 });
 
 // Routes
