@@ -186,6 +186,7 @@ export const orderService = {
             if (filters.search && filters.search.trim() !== "") {
                 query.$or = [
                     { mobileNumber: { $regex: filters.search, $options: "i" } },
+                    { orderNumber: { $regex: `^${filters.search.trim()}$`, $options: "i" } },
                     {
                         user: {
                             $in: await User.find({
